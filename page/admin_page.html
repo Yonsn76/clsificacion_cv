@@ -165,33 +165,9 @@
                     return;
                 }
 
-                // Classify each applicant
-                const classifiedApplicants = [];
-                for (const app of applicants) {
-                    try {
-                        const classifyResponse = await fetch(`${API_BASE_URL}/api/postulaciones/classify/${app.id}`, { method: 'POST' });
-                        if (classifyResponse.ok) {
-                            const classificationResult = await classifyResponse.json();
-                            app.puesto_clasificacion = classificationResult.puesto;
-                            app.porcentaje_clasificacion = classificationResult.porcentaje;
-                        } else {
-                            // Handle cases where classification might fail for an individual CV
-                            app.puesto_clasificacion = 'Error';
-                            app.porcentaje_clasificacion = 0;
-                            console.warn(`Error clasificando postulante ${app.id}: ${classifyResponse.statusText}`);
-                        }
-                    } catch (classifyError) {
-                        app.puesto_clasificacion = 'Error';
-                        app.porcentaje_clasificacion = 0;
-                        console.error(`Error en la llamada de clasificación para ${app.id}:`, classifyError);
-                    }
-                    classifiedApplicants.push(app);
-                }
+                applicants.sort((a, b) => (b.porcentaje_clasificacion || 0) - (a.porcentaje_clasificacion || 0));
 
-                // Sort by percentage descending
-                classifiedApplicants.sort((a, b) => (b.porcentaje_clasificacion || 0) - (a.porcentaje_clasificacion || 0));
-
-                classifiedApplicants.forEach(app => {
+                applicants.forEach(app => {
                     let row = tbody.insertRow();
                     row.insertCell().textContent = app.id;
                     row.insertCell().textContent = app.nombre;
