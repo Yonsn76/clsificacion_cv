@@ -266,65 +266,6 @@ dataset/
 4. Configurar parámetros
 5. Iniciar entrenamiento
 
-### 🔧 **API Reference**
-
-#### **Clasificar CV**
-```python
-import requests
-
-# Clasificar un CV
-response = requests.post('http://localhost:5000/api/classify',
-                        files={'cv': open('curriculum.pdf', 'rb')})
-result = response.json()
-print(f"Categoría: {result['category']}")
-print(f"Confianza: {result['confidence']:.2f}")
-```
-
-#### **Obtener Modelos Disponibles**
-```python
-response = requests.get('http://localhost:5000/api/models')
-models = response.json()
-for model in models:
-    print(f"Modelo: {model['name']} - Precisión: {model['accuracy']:.2f}")
-```
-
----
-
-## 🤝 Contribución
-
-### 🐛 **Reportar Bugs**
-1. Verificar que el bug no haya sido reportado
-2. Crear un issue detallado
-3. Incluir pasos para reproducir
-4. Adjuntar logs si es posible
-
-### 💡 **Sugerir Mejoras**
-1. Abrir un issue con la etiqueta `enhancement`
-2. Describir la funcionalidad propuesta
-3. Explicar el caso de uso
-4. Proporcionar mockups si aplica
-
-### 🔧 **Desarrollo**
-```bash
-# Fork del repositorio
-git clone https://github.com/tu-usuario/clsificacion_cv.git
-cd clsificacion_cv
-
-# Crear rama para feature
-git checkout -b feature/nueva-funcionalidad
-
-# Instalar dependencias de desarrollo
-pip install -r requirements-dev.txt
-
-# Ejecutar tests
-python -m pytest tests/
-
-# Commit y push
-git commit -m "feat: agregar nueva funcionalidad"
-git push origin feature/nueva-funcionalidad
-```
-
----
 
 
 ### ⭐ Si este proyecto te fue útil, ¡dale una estrella!
