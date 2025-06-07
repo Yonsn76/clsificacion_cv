@@ -146,11 +146,16 @@ def update_classification_result(postulacion_id, puesto, porcentaje, modelo):
     try:
         conn = sqlite3.connect(DATABASE_PATH)
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE postulaciones
-            SET puesto_clasificacion = ?, porcentaje_clasificacion = ?, modelo_clasificacion = ?
+            SET puesto_clasificacion = ?,
+                porcentaje_clasificacion = ?,
+                modelo_clasificacion = ?
             WHERE id = ?
-        """, (puesto, porcentaje, modelo, postulacion_id))
+            """,
+            (puesto, porcentaje, modelo, postulacion_id),
+        )
         conn.commit()
     finally:
         if conn:
