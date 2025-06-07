@@ -9,6 +9,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from models.model_manager import ModelManager
 from models.cv_classifier import CVClassifier
+from models.deep_learning_classifier import DeepLearningClassifier
 
 app = Flask(__name__)
 CORS(app)
@@ -35,7 +36,13 @@ def load_active_model():
         return
     # Determinar ruta del modelo según tipo
     model_dir = Settings.DEEP_MODELS_DIR if active_model_is_deep else Settings.MODELS_DIR
-    classifier = CVClassifier(model_dir=str(model_dir))
+
+    if active_model_is_deep:
+        classifier = DeepLearningClassifier()
+        classifier.model_dir = str(model_dir)
+    else:
+        classifier = CVClassifier(model_dir=str(model_dir))
+
     success = classifier.load_model(active_model_name)
     if success:
         active_classifier = classifier
