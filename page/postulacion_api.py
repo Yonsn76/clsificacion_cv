@@ -1,11 +1,18 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 from postulacion_backend import PostulacionManager
 from flask_cors import CORS
+from io import BytesIO
+from models.model_manager import ModelManager
 
 app = Flask(__name__)
 CORS(app)  # Permitir CORS para desarrollo local
 
 postulacion_manager = PostulacionManager()
+model_manager = ModelManager()
+
+# Variables para el modelo activo
+active_model_name = None
+active_model_is_deep = False
 
 @app.route('/api/postulaciones', methods=['GET', 'POST'])
 def handle_postulaciones():
@@ -49,6 +56,40 @@ def handle_postulaciones():
             'estado': p[8]
         })
     return jsonify(postulaciones_list)
+
+
+@app.route('/api/models/active', methods=['GET'])
+def get_active_model():
+    """Devuelve información del modelo de clasificación activo."""
+    if not active_model_name:
+        return jsonify({})
+
+    metadata = model_manager.load_model_metadata(active_model_name, active_model_is_deep)
+    return jsonify({
+        'name': active_model_name,
+        'display_name': metadata.display_name if metadata else active_model_name,
+        'is_deep_learning': active_model_is_deep
+    })
+
+
+@app.route('/api/postulaciones/cv/<int:postulacion_id>', methods=['GET'])
+def download_cv(postulacion_id):
+    """Descarga el archivo CV almacenado para la postulación."""
+    result = postulacion_manager.download_cv(postulacion_id)
+    if not result:
+        return jsonify({'success': False, 'message': 'CV no encontrado'}), 404
+
+    filename, data = result
+    return send_file(BytesIO(data), download_name=filename, as_attachment=True)
+
+
+@app.route('/api/postulaciones/delete/<int:postulacion_id>', methods=['DELETE'])
+def delete_postulacion(postulacion_id):
+    """Elimina una postulación de la base de datos."""
+    success = postulacion_manager.delete_postulacion(postulacion_id)
+    if success:
+        return jsonify({'success': True, 'message': 'Postulación eliminada'})
+    return jsonify({'success': False, 'message': 'Postulación no encontrada'}), 404
 
 if __name__ == '__main__':
     import os
