@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, send_file
-from postulacion_backend import PostulacionManager
-from postulacion_extension import add_classification_columns
+# Importaciones relativas para evitar problemas de rutas
+from .postulacion_backend import PostulacionManager
+from .postulacion_extension import add_classification_columns
 from flask_cors import CORS
 from io import BytesIO
 import joblib
