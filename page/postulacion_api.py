@@ -1,7 +1,10 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 from postulacion_backend import PostulacionManager
 from postulacion_extension import add_classification_columns
 from flask_cors import CORS
+from io import BytesIO
+import joblib
+from PyPDF2 import PdfReader
 import threading
 import sys
 import os
@@ -9,6 +12,7 @@ import json
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from models.model_manager import ModelManager
 from models.cv_classifier import CVClassifier
+from models.deep_learning_classifier import DeepLearningClassifier
 from src.config.settings import Settings
 
 app = Flask(__name__)
@@ -27,14 +31,31 @@ active_classifier = None
 active_classifier_lock = threading.Lock()
 
 
+def extract_text_from_pdf(pdf_bytes):
+    """Extrae texto de un PDF en bytes usando PyPDF2"""
+    text = ""
+    try:
+        reader = PdfReader(BytesIO(pdf_bytes))
+        for page in reader.pages:
+            page_text = page.extract_text() or ""
+            text += page_text + "\n"
+    except Exception as exc:
+        raise ValueError(f"Error extrayendo texto del PDF: {exc}")
+    return text
+
+
 def load_active_model():
     """Carga el modelo activo en memoria"""
     global active_classifier
     if active_model_name is None:
         active_classifier = None
         return
-    model_dir = Settings.DEEP_MODELS_DIR if active_model_is_deep else Settings.MODELS_DIR
-    classifier = CVClassifier(model_dir=str(model_dir))
+    if active_model_is_deep:
+        classifier = DeepLearningClassifier()
+    else:
+        model_dir = Settings.MODELS_DIR
+        classifier = CVClassifier(model_dir=str(model_dir))
+
     success = classifier.load_model(active_model_name)
     active_classifier = classifier if success else None
 
@@ -143,6 +164,27 @@ def select_model():
     return jsonify({'success': True, 'message': f'Modelo {model_name} seleccionado'})
 
 
+@app.route('/api/models/active', methods=['GET'])
+def get_active_model():
+    """Devuelve información del modelo activo"""
+    if not active_model_name:
+        return jsonify({})
+    model_dir = Settings.DEEP_MODELS_DIR if active_model_is_deep else Settings.MODELS_DIR
+    metadata_path = os.path.join(model_dir, active_model_name, 'metadata.pkl')
+    display_name = active_model_name
+    if os.path.exists(metadata_path):
+        try:
+            metadata = joblib.load(metadata_path)
+            display_name = metadata.get('model_name', active_model_name)
+        except Exception:
+            pass
+    return jsonify({
+        'name': active_model_name,
+        'display_name': display_name,
+        'is_deep_learning': active_model_is_deep
+    })
+
+
 @app.route('/api/postulaciones/classify/<int:postulacion_id>', methods=['POST'])
 def classify_postulacion(postulacion_id):
     global active_classifier, active_model_name
@@ -156,9 +198,9 @@ def classify_postulacion(postulacion_id):
         return jsonify({'success': False, 'message': 'CV no encontrado'}), 404
     _, cv_bytes = cv_data
     try:
-        cv_text = cv_bytes.decode('utf-8', errors='ignore')
+        cv_text = extract_text_from_pdf(cv_bytes)
     except Exception as e:
-        return jsonify({'success': False, 'message': f'Error decodificando CV: {str(e)}'}), 500
+        return jsonify({'success': False, 'message': str(e)}), 500
     result = active_classifier.predict_cv(cv_text)
     if result.get('error'):
         return jsonify({'success': False, 'message': result.get('message')}), 500
@@ -170,6 +212,25 @@ def classify_postulacion(postulacion_id):
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error guardando resultado: {str(e)}'}), 500
     return jsonify({'success': True, 'puesto': puesto, 'porcentaje': porcentaje, 'modelo': active_model_name})
+
+
+@app.route('/api/postulaciones/cv/<int:postulacion_id>', methods=['GET'])
+def download_cv(postulacion_id):
+    """Devuelve el archivo CV guardado"""
+    cv_data = postulacion_manager.download_cv(postulacion_id)
+    if not cv_data:
+        return jsonify({'success': False, 'message': 'CV no encontrado'}), 404
+    filename, data = cv_data
+    return send_file(BytesIO(data), download_name=filename, as_attachment=True)
+
+
+@app.route('/api/postulaciones/delete/<int:postulacion_id>', methods=['DELETE'])
+def delete_postulacion(postulacion_id):
+    """Elimina una postulación"""
+    success = postulacion_manager.delete_postulacion(postulacion_id)
+    if success:
+        return jsonify({'success': True, 'message': 'Postulación eliminada'})
+    return jsonify({'success': False, 'message': 'No se pudo eliminar'}), 400
 
 
 def update_classification_result(postulacion_id, puesto, porcentaje, modelo):
