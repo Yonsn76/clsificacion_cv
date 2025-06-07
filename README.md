@@ -326,34 +326,6 @@ git push origin feature/nueva-funcionalidad
 
 ---
 
-## 📄 Licencia
-
-Este proyecto está licenciado bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para más detalles.
-
----
-
-## 👨‍💻 Autor
-
-**Desarrollado por:** [Tu Nombre](https://github.com/yonsn76)
-
-**Contacto:**
-- 📧 Email: tu-email@ejemplo.com
-- 💼 LinkedIn: [Tu Perfil](https://linkedin.com/in/tu-perfil)
-- 🐦 Twitter: [@tu_usuario](https://twitter.com/tu_usuario)
-
----
-
-## 🙏 Agradecimientos
-
-- **Hugging Face** por los modelos Transformers
-- **Google** por TensorFlow
-- **Scikit-learn** por los algoritmos de ML
-- **Qt Company** por PyQt6
-- **Flask** por el framework web
-
----
-
-<div align="center">
 
 ### ⭐ Si este proyecto te fue útil, ¡dale una estrella!
 
