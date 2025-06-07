@@ -1,6 +1,14 @@
 import os
 import re
-from postulacion_db import init_database, add_postulacion, get_all_postulaciones, get_postulacion_by_id, get_cv_data, delete_postulacion_from_db
+# Importaciones relativas para mantener la coherencia del paquete
+from .postulacion_db import (
+    init_database,
+    add_postulacion,
+    get_all_postulaciones,
+    get_postulacion_by_id,
+    get_cv_data,
+    delete_postulacion_from_db,
+)
 
 class PostulacionManager:
     """Clase para manejar las operaciones de postulación."""
