@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import threading
+import io
+import PyPDF2
 
 from postulacion_backend import PostulacionManager
 from postulacion_extension import add_classification_columns
@@ -27,6 +29,20 @@ active_classifier_lock = threading.Lock()
 
 import os
 from src.config.settings import Settings
+
+
+def extract_text_from_pdf_bytes(pdf_bytes):
+    """Extract text from a PDF represented by bytes."""
+    try:
+        reader = PyPDF2.PdfReader(io.BytesIO(pdf_bytes))
+        text = ""
+        for page in reader.pages:
+            page_text = page.extract_text()
+            if page_text:
+                text += page_text + "\n"
+        return text.strip()
+    except Exception:
+        return ""
 
 def load_active_model():
     global active_classifier
@@ -118,11 +134,10 @@ def classify_postulacion(postulacion_id):
     if not cv_data:
         return jsonify({'success': False, 'message': 'CV no encontrado'}), 404
     cv_filename, cv_bytes = cv_data
-    try:
-        # Convertir bytes a texto para clasificación (asumiendo texto plano o extraído)
-        cv_text = cv_bytes.decode('utf-8', errors='ignore')
-    except Exception as e:
-        return jsonify({'success': False, 'message': f'Error decodificando CV: {str(e)}'}), 500
+    # Extraer texto del PDF usando PyPDF2
+    cv_text = extract_text_from_pdf_bytes(cv_bytes)
+    if not cv_text:
+        return jsonify({'success': False, 'message': 'No se pudo extraer texto del CV'}), 500
     result = active_classifier.predict_cv(cv_text)
     if result.get('error'):
         return jsonify({'success': False, 'message': result.get('message')}), 500
