@@ -32,4 +32,4 @@ class Settings:
         for directory in directories:
             directory.mkdir(parents=True, exist_ok=True)
             
-        return True 
+        return True

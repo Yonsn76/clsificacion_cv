@@ -13,7 +13,7 @@ from sklearn.metrics import classification_report, accuracy_score
 import warnings
 import json
 import datetime
-import pickle
+from src.config.settings import Settings
 warnings.filterwarnings('ignore')
 
 from .model_manager import ModelManager
@@ -71,7 +71,7 @@ class DeepLearningClassifier:
         # Inicializar el gestor de modelos
         self.model_manager = ModelManager()
         self.model_dir = self.model_manager.deep_models_dir
-        self.bert_cache_dir = os.path.join(self.model_dir, 'bert_cache')
+        self.bert_cache_dir = Settings.BERT_CACHE_DIR
         os.makedirs(self.bert_cache_dir, exist_ok=True)
     
     def check_dependencies(self, model_type):
