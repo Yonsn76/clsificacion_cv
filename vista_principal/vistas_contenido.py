@@ -105,9 +105,8 @@ class ModelImageIndicator(QLabel):
     def load_image(self):
         """Carga la imagen correspondiente al tipo de modelo"""
         # print(f"Cargando imagen para tipo: {self.indicator_type}")
-        base_path = os.path.dirname(os.path.abspath(__file__))
-        icons_dir = os.path.join(base_path, "icons_png")
-
+        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        icons_dir = os.path.join(base_path, "resources", "icons_png")
         if self.indicator_type == "ml":
             image_path = os.path.join(icons_dir, "ML.png")
         else:  # deep learning

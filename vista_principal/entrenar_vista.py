@@ -24,14 +24,13 @@ class ModelImageIndicator(QLabel):
         self.load_image()
 
     def load_image(self):
-        base_path = os.path.dirname(os.path.abspath(__file__))
-        icons_dir = os.path.join(base_path, "icons_png")
+        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        icons_dir = os.path.join(base_path, "resources", "icons_png")
 
         if self.indicator_type == "ml":
             image_path = os.path.join(icons_dir, "ML.png")
         else:
             image_path = os.path.join(icons_dir, "DL.png")
-
         if os.path.exists(image_path):
             self._original_pixmap = QPixmap(image_path)
             if not self._original_pixmap.isNull() and self._original_pixmap.width() > 0:

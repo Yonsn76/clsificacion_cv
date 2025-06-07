@@ -20,10 +20,10 @@ from PyQt6.QtCore import QUrl
 
 
 # --- Importar las vistas desde sus archivos separados ---
-from entrenar_vista import seleccion 
-from vista_herramientas import VistaHerramientas
-from vista_centro_accion import VistaCentroAccion
-from vista_importar_exportar import VistaImportarExportar
+from vista_principal.entrenar_vista import seleccion
+from vista_principal.vista_herramientas import VistaHerramientas
+from vista_principal.vista_centro_accion import VistaCentroAccion
+from vista_principal.vista_importar_exportar import VistaImportarExportar
 from models.model_manager import ModelManager, ModelMetadata # Añadido
 
 # --- Icon Resource Function ---
@@ -345,7 +345,7 @@ class MainWindow(QMainWindow):
         self.button_to_page_map = {} 
         
         base_path = os.path.dirname(os.path.abspath(__file__)) 
-        icons_dir = os.path.join(base_path, "icons_png")
+        icons_dir = os.path.join(base_path, "resources/icons_png")
 
         button_data = [
             (os.path.join(icons_dir, "inicio.png"), "Inicio"),
@@ -1069,7 +1069,7 @@ class MainWindow(QMainWindow):
     def open_documentation(self):
         """Abre la documentación HTML en una ventana dentro de la aplicación"""
         try:
-            doc_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "docs", "documentation.html")
+            doc_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources/docs", "documentation.html")
             if os.path.exists(doc_path):
                 # Crear y mostrar la ventana de documentación
                 self.doc_window = DocumentationWindow(self)

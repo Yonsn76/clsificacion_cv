@@ -53,7 +53,7 @@ def list_models():
 
     # List deep learning models by scanning saved_deep_models directory
     dl_models = []
-    saved_dl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'saved_deep_models')
+    saved_dl_dir = Settings.DEEP_MODELS_DIR
     if os.path.exists(saved_dl_dir):
         for model_name in os.listdir(saved_dl_dir):
             model_path = os.path.join(saved_dl_dir, model_name)
