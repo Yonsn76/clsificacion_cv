@@ -97,7 +97,7 @@ cv_clasification/
 ├── 📊 db_manager.py                  # Gestión de base de datos
 ├── 🎵 create_success_sound.py        # Efectos de sonido
 │
-├── 🖼️ Vista Principal/
+├── 🖼️ vista_principal/
 │   ├── entrenar_vista.py             # Interfaz de entrenamiento
 │   ├── vista_centro_accion.py        # Panel de clasificación
 │   ├── vista_herramientas.py         # Gestión de modelos
@@ -125,7 +125,7 @@ cv_clasification/
 │   ├── notification_manager.py      # Gestor principal
 │   └── model_notifications.py       # Notificaciones de modelos
 │
-├── 🎨 Recursos/
+├── 🎨 resources/
 │   ├── icons/                       # Iconos SVG
 │   ├── icons_png/                   # Iconos PNG
 │   └── docs/                        # Documentación HTML
@@ -241,7 +241,7 @@ La documentación completa está disponible en formato HTML interactivo:
 # Ir a: Barra de herramientas → Documentación
 ```
 
-O acceder directamente al archivo: `docs/documentation.html`
+O acceder directamente al archivo: `resources/docs/documentation.html`
 
 ### 🎯 **Guía de Entrenamiento**
 
