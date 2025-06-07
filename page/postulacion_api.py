@@ -1,14 +1,22 @@
 from flask import Flask, jsonify, request, send_file
-# Importaciones relativas para evitar problemas de rutas
-from .postulacion_backend import PostulacionManager
-from .postulacion_extension import add_classification_columns
+import os
+import sys
+
+# Permitir ejecutar este módulo de forma independiente o como parte del paquete
+if __package__ is None or __package__ == "":
+    # Ejecutado directamente, ajustar sys.path e importar con rutas absolutas
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(os.path.join(current_dir, ".."))
+    from postulacion_backend import PostulacionManager  # type: ignore
+    from postulacion_extension import add_classification_columns  # type: ignore
+else:
+    from .postulacion_backend import PostulacionManager
+    from .postulacion_extension import add_classification_columns
 from flask_cors import CORS
 from io import BytesIO
 import joblib
 from PyPDF2 import PdfReader
 import threading
-import sys
-import os
 import json
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from models.model_manager import ModelManager
@@ -257,13 +265,22 @@ def update_classification_result(postulacion_id, puesto, porcentaje, modelo):
             conn.close()
 
 
+def is_port_in_use(port: int) -> bool:
+    """Devuelve True si el puerto está ocupado."""
+    import socket
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        return sock.connect_ex(("localhost", port)) == 0
+
+
 def start_server(port=5000):
     """Inicia el servidor Flask"""
     app.run(host='0.0.0.0', debug=True, port=port)
 
 
 def start_server_thread(port=5000):
-    """Inicia el servidor en un hilo separado"""
+    """Inicia el servidor en un hilo separado si el puerto está libre"""
+    if is_port_in_use(port):
+        return None
     thread = threading.Thread(target=start_server, kwargs={'port': port}, daemon=True)
     thread.start()
     return thread
