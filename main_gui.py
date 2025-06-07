@@ -1112,10 +1112,15 @@ class MainWindow(QMainWindow):
 
 
 if __name__ == '__main__':
+    from page.postulacion_api import start_server_thread
+
+    # Iniciar la API web en segundo plano
+    start_server_thread()
+
     app = QApplication(sys.argv)
-    app.setApplicationName("ClasificaTalento PRO") 
-    app.setOrganizationName("TalentHunter") 
-    
+    app.setApplicationName("ClasificaTalento PRO")
+    app.setOrganizationName("TalentHunter")
+
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
